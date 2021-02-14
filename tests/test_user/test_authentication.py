@@ -19,7 +19,7 @@ EXISTENT_USER = User(
     patronymic="kabab",
     email=EXISTENT_EMAIL,
     password="Test@123",
-    role="participant"
+    role="user"
 )
 
 WRONG_ANSWER_USER = User(
@@ -29,7 +29,7 @@ WRONG_ANSWER_USER = User(
     patronymic="kabab",
     email=WRONG_PASSWORD_EMAIL,
     password="Test@123",
-    role="participant"
+    role="user"
 )
 
 
@@ -39,7 +39,6 @@ class MockedUserMapper:
         email = kwargs.get("email")
         if email is None:
             raise ValueError("Expected 'email' argument")
-        print(email)
         if email == EXISTENT_EMAIL:
             return EXISTENT_USER
         elif email == WRONG_PASSWORD_EMAIL:

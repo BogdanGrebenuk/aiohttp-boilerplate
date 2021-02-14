@@ -18,7 +18,7 @@ EXISTENT_USER = User(
     patronymic="kabab",
     email="test_email_existent@test.com",
     password="Test@123",
-    role="participant"
+    role="user"
 )
 
 
@@ -56,7 +56,7 @@ class RegistrationTests(AioHTTPTestCase):
                 last_name="test",
                 first_name="test",
                 patronymic="test",
-                role="participant"
+                role="user"
             )
         )
 
@@ -75,7 +75,7 @@ class RegistrationTests(AioHTTPTestCase):
                     last_name="test",
                     first_name="test",
                     patronymic="test",
-                    role="participant"
+                    role="user"
                 )
             )
 
