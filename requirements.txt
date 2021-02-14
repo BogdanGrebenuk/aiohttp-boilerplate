@@ -9,3 +9,4 @@ dependency_injector==4.5.1
 nest_asyncio
 aiohttp_jwt
 pyyaml
+aiohttp_cors

@@ -1,5 +1,6 @@
 import pathlib
 
+import aiohttp_cors
 from aiohttp import web
 
 from app.containers import ApplicationContainer
@@ -29,6 +30,18 @@ def create_app():
     )
     app.container = application_container
     setup_routes(app)
+
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods="*"
+        )
+    })
+
+    for route in app.router.routes():
+        cors.add(route)
 
     app.on_startup.append(init_resources)
     app.on_shutdown.append(shutdown_resources)
