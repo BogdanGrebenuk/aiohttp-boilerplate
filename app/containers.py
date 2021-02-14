@@ -40,7 +40,7 @@ class ApplicationUtilsContainer(containers.DeclarativeContainer):
         pool=gateways.process_pool
     )
 
-    thread_pool = providers.Singleton(
+    thread_executor = providers.Singleton(
         Executor,
         pool=gateways.thread_pool
     )
