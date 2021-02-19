@@ -5,7 +5,7 @@ from dependency_injector.ext import aiohttp as ext_aiohttp
 
 from app.db import models
 from app.db.mappers.user import UserMapper
-from app.middlewares import error_handler, create_jwt_middleware, request_logger
+from app.middlewares import error_handler, create_jwt_middleware, request_logger, additional_token_checker
 from app.user.containers import UserPackageContainer
 from app.user.domain.entity import User
 from app.utils.engine import init_engine
@@ -82,6 +82,11 @@ class MiddlewareContainer(containers.DeclarativeContainer):
     request_logger = ext_aiohttp.Middleware(
         request_logger,
         logger=application_utils.logger
+    )
+
+    additional_token_checker = ext_aiohttp.Middleware(
+        additional_token_checker,
+        user_mapper=mappers.user_mapper
     )
 
 

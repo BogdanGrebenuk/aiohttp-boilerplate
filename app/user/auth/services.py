@@ -92,6 +92,9 @@ class Authenticator:
             {'user_id': user.id}
         )
 
+        user.token = token
+        await self.user_mapper.update(user)
+
         return token
 
 

@@ -12,3 +12,4 @@ class User(Entity):
     email: str
     password: str
     role: str
+    token: str = None

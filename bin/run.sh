@@ -1,5 +1,7 @@
 source venv/bin/activate
-cd tests
-PYTHONPATH='..' python -m unittest -v
+cd app
+PYTHONPATH='..' alembic upgrade head
+cd ../tests
+PYTHONPATH='..' python -m unittest
 cd ..
-python -m app
+nohup python -m app

@@ -13,5 +13,6 @@ User = sa.Table(
     sa.Column('patronymic', sa.Text, nullable=False),
     sa.Column('email', sa.Text, nullable=False, unique=True),
     sa.Column('password', sa.Text, nullable=False),
-    sa.Column('role', sa.Text, nullable=False)
+    sa.Column('role', sa.Text, nullable=False),
+    sa.Column('token', sa.Text, nullable=True)
 )

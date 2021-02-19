@@ -8,6 +8,9 @@ def setup_routes(app):
         'POST', '/login', container.user.authenticate_user.as_view()
     )
     app.router.add_route(
+        'POST', '/logout', container.user.logout_user.as_view()
+    )
+    app.router.add_route(
         'GET', '/api/users', container.user.get_users.as_view()
     )
     app.router.add_route(

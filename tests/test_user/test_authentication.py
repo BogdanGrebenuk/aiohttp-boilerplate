@@ -46,6 +46,9 @@ class MockedUserMapper:
             return WRONG_ANSWER_USER
         return None
 
+    async def update(self, *args, **kwargs):
+        pass
+
 
 class MockedPasswordChecker:
 

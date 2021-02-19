@@ -4,7 +4,7 @@ from aiohttp import web
 async def get_user(request, user_mapper, user_transformer):
     user_id = request.match_info.get('user_id')
     if user_id == 'me':
-        user_id = request['user']
+        user_id = request['user_id']
 
     user = await user_mapper.find(user_id)
     if user is None:

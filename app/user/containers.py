@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 from dependency_injector.ext import aiohttp as ext_aiohttp
 
-from app.user.auth.controllers import register_user, authenticate_user
+from app.user.auth.controllers import register_user, authenticate_user, logout_user
 from app.user.auth.services import (
     PasswordHasher,
     PasswordChecker,
@@ -66,6 +66,11 @@ class UserPackageContainer(containers.DeclarativeContainer):
     authenticate_user = ext_aiohttp.View(
         authenticate_user,
         authenticator=authenticator
+    )
+
+    logout_user = ext_aiohttp.View(
+        logout_user,
+        user_mapper=mappers.user_mapper
     )
 
     get_user = ext_aiohttp.View(

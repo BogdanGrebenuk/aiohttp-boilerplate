@@ -21,9 +21,10 @@ def create_app():
 
     app = web.Application(
         middlewares=[
+            application_container.middlewares.request_logger,
             application_container.middlewares.error_handler,
             application_container.middlewares.jwt_middleware(),
-            application_container.middlewares.request_logger
+            application_container.middlewares.additional_token_checker,
         ]
     )
     app.container = application_container

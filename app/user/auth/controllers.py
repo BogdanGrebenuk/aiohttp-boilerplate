@@ -41,3 +41,13 @@ async def register_user(
     await user_mapper.create(user)
 
     return web.json_response(await user_transformer.transform(user))
+
+
+async def logout_user(request, user_mapper):
+    user = await user_mapper.find(request.get('user_id'))
+
+    user.token = None
+
+    await user_mapper.update(user)
+
+    return web.json_response({})
