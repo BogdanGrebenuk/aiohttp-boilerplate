@@ -1,31 +1,29 @@
+import logging
 import pathlib
+import sys
 
 import aiohttp_cors
 from aiohttp import web
 
 from app.containers import ApplicationContainer
 from app.resources import setup_routes
-from app.utils.commandbus.middlewares import Resolver, Validator
 
 
 def get_config_path():
-    return str((pathlib.Path(__file__).parent.parent / 'config' / 'config.yaml').resolve())
+    return str(
+        (pathlib.Path(__file__).parent.parent / 'config' / 'config.yaml').resolve()
+    )
 
 
 def create_app():
     application_container = ApplicationContainer()
-    config_path = get_config_path()
-    application_container.config.from_yaml(config_path)
-
-    application_container.application_utils.bus().set_middlewares([
-        Validator(),
-        Resolver(application_container)
-    ])
+    application_container.config.from_yaml(get_config_path())
 
     app = web.Application(
         middlewares=[
             application_container.middlewares.error_handler,
             application_container.middlewares.jwt_middleware(),
+            application_container.middlewares.request_logger
         ]
     )
     app.container = application_container
@@ -45,6 +43,10 @@ def create_app():
 
     app.on_startup.append(init_resources)
     app.on_shutdown.append(shutdown_resources)
+
+    logger_handler = logging.StreamHandler(sys.stdout)
+    logger_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    application_container.application_utils.logger().addHandler(logger_handler)
 
     return app
 

@@ -3,9 +3,9 @@ import uuid
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from marshmallow import ValidationError
 
-from app.user.auth.commands import CreateUser
 from app.exceptions.application import DomainException
 from app.main import create_app
+from app.user.auth.dto import CreateUserDto
 from app.user.domain.entity import User
 
 
@@ -46,10 +46,10 @@ class RegistrationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_successful_case(self):
-        bus = self.app.container.application_utils.bus()
+        registrar = self.app.container.user.registrar()
 
-        user = await bus.execute(
-            CreateUser(
+        user = await registrar.register(
+            CreateUserDto(
                 id=str(uuid.uuid4()),
                 email=NON_EXISTENT_EMAIL,
                 password="test",
@@ -64,11 +64,11 @@ class RegistrationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_existent_email_case(self):
-        bus = self.app.container.application_utils.bus()
+        registrar = self.app.container.user.registrar()
 
         with self.assertRaises(DomainException):
-            await bus.execute(
-                CreateUser(
+            await registrar.register(
+                CreateUserDto(
                     id=str(uuid.uuid4()),
                     email=EXISTENT_USER.email,
                     password="test",
@@ -81,11 +81,11 @@ class RegistrationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_data_not_provided_case(self):
-        bus = self.app.container.application_utils.bus()
+        registrar = self.app.container.user.registrar()
 
         with self.assertRaises(ValidationError) as cm:
-            await bus.execute(
-                CreateUser(
+            await registrar.register(
+                CreateUserDto(
                     id=None,
                     email=None,
                     password=None,
@@ -98,5 +98,5 @@ class RegistrationTests(AioHTTPTestCase):
 
         exception = cm.exception
         self.assertEqual(
-            len(exception.messages), len(CreateUser.__dataclass_fields__)
+            len(exception.messages), len(CreateUserDto.__dataclass_fields__)
         )

@@ -11,3 +11,8 @@ class CreateUserSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True, validate=validate.Length(min=1))
     role = fields.String(required=True, validate=validate.OneOf(UserRole.get_roles()))
+
+
+class AuthenticateUserSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.String(required=True, validate=validate.Length(min=1))

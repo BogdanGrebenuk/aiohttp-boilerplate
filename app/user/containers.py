@@ -1,13 +1,12 @@
 from dependency_injector import containers, providers
 from dependency_injector.ext import aiohttp as ext_aiohttp
 
-from app.user.auth.command_handlers import CreateUserHandler
 from app.user.auth.controllers import register_user, authenticate_user
 from app.user.auth.services import (
     PasswordHasher,
     PasswordChecker,
     TokenGenerator,
-    Authenticator
+    Authenticator, Registrar
 )
 from app.user.controllers import get_user, get_users
 from app.user.transformers import UserTransformer
@@ -44,14 +43,22 @@ class UserPackageContainer(containers.DeclarativeContainer):
         Authenticator,
         user_mapper=mappers.user_mapper,
         password_checker=password_checker,
-        token_generator=token_generator
+        token_generator=token_generator,
+        validator=application_utils.validator,
+    )
+
+    registrar = providers.Singleton(
+        Registrar,
+        user_mapper=mappers.user_mapper,
+        password_hasher=password_hasher,
+        validator=application_utils.validator,
     )
 
     # controllers
 
     register_user = ext_aiohttp.View(
         register_user,
-        bus=application_utils.bus,
+        registrar=registrar,
         user_mapper=mappers.user_mapper,
         user_transformer=user_transformer
     )
@@ -71,12 +78,4 @@ class UserPackageContainer(containers.DeclarativeContainer):
         get_users,
         user_mapper=mappers.user_mapper,
         user_transformer=user_transformer
-    )
-
-    # command_handlers
-
-    create_user_handler = providers.Singleton(
-        CreateUserHandler,
-        user_mapper=mappers.user_mapper,
-        password_hasher=password_hasher
     )

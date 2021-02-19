@@ -2,6 +2,7 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 from app.exceptions.application import DomainException
 from app.main import create_app
+from app.user.auth.dto import AuthenticateUserDto
 from app.user.domain.entity import User
 from app.utils.mapper import EntityNotFound
 
@@ -74,7 +75,9 @@ class AuthenticationTests(AioHTTPTestCase):
         authenticator = self.app.container.user.authenticator()
 
         token = await authenticator.authenticate(
-            EXISTENT_EMAIL, EXISTENT_USER.password
+            AuthenticateUserDto(
+                EXISTENT_EMAIL, EXISTENT_USER.password
+            )
         )
 
         self.assertIsInstance(token, str)
@@ -85,7 +88,9 @@ class AuthenticationTests(AioHTTPTestCase):
 
         with self.assertRaises(EntityNotFound):
             await authenticator.authenticate(
-                NON_EXISTENT_EMAIL, 'test_password'
+                AuthenticateUserDto(
+                    NON_EXISTENT_EMAIL, 'test_password'
+                )
             )
 
     @unittest_run_loop
@@ -94,5 +99,7 @@ class AuthenticationTests(AioHTTPTestCase):
 
         with self.assertRaises(DomainException):
             await authenticator.authenticate(
-                WRONG_PASSWORD_EMAIL, 'test_password'
+                AuthenticateUserDto(
+                    WRONG_PASSWORD_EMAIL, 'test_password'
+                )
             )

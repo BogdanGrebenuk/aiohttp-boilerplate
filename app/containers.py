@@ -1,18 +1,20 @@
+import logging
+
 from dependency_injector import containers, providers
 from dependency_injector.ext import aiohttp as ext_aiohttp
 
 from app.db import models
 from app.db.mappers.user import UserMapper
-from app.middlewares import error_handler, create_jwt_middleware
+from app.middlewares import error_handler, create_jwt_middleware, request_logger
 from app.user.containers import UserPackageContainer
 from app.user.domain.entity import User
-from app.utils.commandbus import Bus
 from app.utils.engine import init_engine
 from app.utils.executor import (
     Executor,
     init_process_pool,
     init_thread_pool
 )
+from app.utils.validator import Validator
 
 
 class Gateways(containers.DeclarativeContainer):
@@ -33,8 +35,6 @@ class ApplicationUtilsContainer(containers.DeclarativeContainer):
 
     gateways = providers.DependenciesContainer()
 
-    bus = providers.Singleton(Bus)
-
     process_executor = providers.Singleton(
         Executor,
         pool=gateways.process_pool
@@ -44,7 +44,10 @@ class ApplicationUtilsContainer(containers.DeclarativeContainer):
         Executor,
         pool=gateways.thread_pool
     )
-    # TODO: logger, config?
+
+    validator = providers.Singleton(Validator)
+
+    logger = providers.Singleton(logging.Logger, name='main')
 
 
 class MappersContainer(containers.DeclarativeContainer):
@@ -61,6 +64,8 @@ class MappersContainer(containers.DeclarativeContainer):
 
 class MiddlewareContainer(containers.DeclarativeContainer):
 
+    application_utils = providers.DependenciesContainer()
+
     mappers = providers.DependenciesContainer()
 
     config = providers.Configuration()
@@ -72,6 +77,11 @@ class MiddlewareContainer(containers.DeclarativeContainer):
 
     error_handler = ext_aiohttp.Middleware(
         error_handler
+    )
+
+    request_logger = ext_aiohttp.Middleware(
+        request_logger,
+        logger=application_utils.logger
     )
 
 
@@ -97,7 +107,8 @@ class ApplicationContainer(containers.DeclarativeContainer):
     middlewares = providers.Container(
         MiddlewareContainer,
         mappers=mappers,
-        config=config
+        config=config,
+        application_utils=application_utils
     )
 
     user = providers.Container(
