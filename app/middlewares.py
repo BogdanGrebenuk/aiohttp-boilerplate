@@ -23,6 +23,8 @@ async def error_handler(request, handler):
     try:
         response = await handler(request)
         return response
+    except web.HTTPError as e:
+        raise
     except ValidationError as e:
         return web.json_response({
             'error': 'Validation error',
