@@ -3,7 +3,7 @@ from aiohttp_jwt import JWTMiddleware
 from marshmallow import ValidationError
 
 from app.exceptions.application import AppException
-
+from app.utils.mapper import EntityNotFound
 
 WHITELIST = [
     r"/login",
@@ -28,6 +28,11 @@ async def error_handler(request, handler):
             'error': 'Validation error',
             'payload': e.messages
         }, status=400)
+    except EntityNotFound as e:
+        return web.json_response({
+            'error': e.message,
+            'payload': e.payload
+        }, status=404)
     except AppException as e:
         return web.json_response({
             'error': e.message,
